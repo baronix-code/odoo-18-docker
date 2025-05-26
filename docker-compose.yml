@@ -6,7 +6,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8069:8069"
+      - "8069:8069"    # Solo exponemos Odoo
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./config:/etc/odoo
@@ -16,7 +16,7 @@ services:
       - HOST=db
       - USER=odoo
       - PASSWORD=odoo
-    command: odoo -d odoo --db_user=odoo --db_password=odoo -i base
+    command: odoo -c /etc/odoo/odoo.conf
     restart: always
 
   db:
@@ -25,8 +25,7 @@ services:
       - POSTGRES_DB=odoo
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
-    ports:
-      - "5432:5432"
+    # NO exponemos el puerto 5432 para evitar accesos externos
     volumes:
       - odoo-db-data:/var/lib/postgresql/data
     restart: always
@@ -34,3 +33,5 @@ services:
 volumes:
   odoo-web-data:
     name: odoo-18-docker_odoo-web-data
+  odoo-db-data:
+    name: odoo-18-docker_odoo-db-data
