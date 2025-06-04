@@ -21,20 +21,21 @@ class Http(models.AbstractModel):
             'session_info': self.session_info(),
         }
 
-    def session_info(self):
-        ICP = self.env['ir.config_parameter'].sudo()
-
-        if self.env.user.has_group('base.group_system'):
-            warn_enterprise = 'admin'
-        elif self.env.user._is_internal():
-            warn_enterprise = 'user'
-        else:
-            warn_enterprise = False
-
-        result = super(Http, self).session_info()
-        result['support_url'] = "https://www.odoo.com/help"
-        if warn_enterprise:
-            result['warning'] = warn_enterprise
-            result['expiration_date'] = ICP.get_param('database.expiration_date')
-            result['expiration_reason'] = ICP.get_param('database.expiration_reason')
-        return result
+def session_info(self):
+    # Determinar el tipo de usuario según su grupo
+    if self.env.user.has_group('base.group_system'):
+        warn_enterprise = 'admin'
+    elif self.env.user._is_internal():
+        warn_enterprise = 'user'
+    else:
+        warn_enterprise = False
+    
+    # Obtener la información original de la sesión
+    result = super().session_info()
+    
+    # Agregar información extra al resultado
+    result['warn_enterprise'] = warn_enterprise
+    result['support_url'] = "https://www.odoo.com/help"
+    
+    # Devolver la información actualizada
+    return result
